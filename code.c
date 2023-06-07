@@ -1,7 +1,6 @@
 #include <Wire.h>
 #include "MAX30105.h"
 #include "heartRate.h"
-#include <TM1637Display.h> //TM1637
 #include <SoftwareSerial.h>
 #include <LiquidCrystal_I2C.h>
 
@@ -93,7 +92,7 @@ void loop()
         lcd.println(beatAvglast);
         beatAvglast = beatAvg;
         if(beatAvg < 60 || beatAvg >100){
-          
+          // 코드 채워넣어야함 ! 비정상일 때 어떻게 해야 하는지...
         }
       }
     }
