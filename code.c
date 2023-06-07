@@ -87,6 +87,12 @@ void loop()
         lcd.clear(); // LCD 화면 지우기
         lcd.setCursor(0, 0); // LCD 커서 위치 설정
         lcd.println(beatAvglast); // 이전 심박수 평균값 출력
+        BTserial.print("현재 심박수 : ");
+        BTserial.print(beatAvg);
+        BTserial.print("이전 심박수 : ");
+        BTserial.print(beatAvglast);
+        BTserial.print("(단위 : bpm");
+        delay(1000);
         beatAvglast = beatAvg; // 현재 심박수 평균값을 이전 값으로 저장
 
         if (beatAvg < 60 || beatAvg > 100) {
