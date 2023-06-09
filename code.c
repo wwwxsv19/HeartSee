@@ -3,9 +3,19 @@
 #include "heartRate.h" // 심박수 측정 관련 함수 라이브러리
 #include <SoftwareSerial.h> // 소프트웨어 시리얼 통신 라이브러리
 #include <LiquidCrystal_I2C.h> // I2C LCD 라이브러리
+#include<TM1637Display.h>
 
-MAX30105 particleSensor; // 심박센서 객체 생성
-LiquidCrystal_I2C lcd(0x27,16,2); // I2C LCD 객체 생성
+#define CLK 6
+#define DIO 7
+TM1637Display display(CLK, DIO);
+
+#define BT_RXD 4
+#define BT_TXD 5
+SoftwareSerial bluetooth(BT_RXD,BT_TXD);
+
+LiquidCrystal_I2C lcd(0x27, 16, 2); // I2C LCD 객체 생성
+
+MAX30105 particleSensor; // 심박센서 객체 생성 
 SoftwareSerial BTSerial(2,3); // 소프트웨어 시리얼 객체 생성 (블루투스 통신에 사용)
 
 const byte RATE_SIZE = 4; // 심박수 측정에 사용되는 배열 크기
@@ -24,17 +34,21 @@ int bluePin = 13; // 파란색 LED 핀
 
 void setup()
 {
-  Serial.begin(9600); // 시리얼 통신 초기화
+  Serial.begin(115200); // 시리얼 통신 초기화
   BTSerial.begin(9600); // 소프트웨어 시리얼 통신 초기화
+  bluetooth.begin(9600);//블루투스 통신 초기화
   
   Serial.println("Initializing..."); // 초기화 메시지 출력
   display.setBrightness(0x0f); // 디스플레이 밝기 설정 (최대)
   display.showNumberDec(0, false); // 디스플레이에 0 표시
+
+  lcd.init();
+  lcd.backlight();
   
   // 심박센서 초기화
   if (!particleSensor.begin(Wire, I2C_SPEED_FAST))
   {
-    Serial.println("MAX30105 was not found. Please check wiring/power. "); // 심박센서 연결 여부 확인
+    Serial.println("MAX30102 was not found. Please check wiring/power. "); // 심박센서 연결 여부 확인
     while (1); // 연결 오류 시 무한루프
   }
   Serial.println("Place your index finger on the sensor with steady pressure."); // 손가락을 센서 위에 안정적으로 누워두라는 안내 메시지 출력
@@ -45,12 +59,16 @@ void setup()
   pinMode(redPin, OUTPUT); // 빨간색 LED 출력 설정
   pinMode(greenPin, OUTPUT); // 초록색 LED 출력 설정
   pinMode(bluePin, OUTPUT); // 파란색 LED 출력 설정
-  lcd.init(); // LCD 초기화
-  lcd.backlight(); // LCD 백라이트 켜기
 }
 
 void loop()
 {
+  if(bluetooth.available()){
+    Serial.write(bluetooth.read());
+  }
+  if(Serial.available()){
+    bluetooth.write(Serial.read());
+  }
   long irValue = particleSensor.getIR(); // IR 값을 읽어옴
 
   if (BTSerial.available()) {
@@ -82,21 +100,23 @@ void loop()
 
       if (irValue < 50000){
         display.showNumberDec(0, false); // IR 값이 임계값보다 작으면 디스플레이에 0 표시
-      } else {
+      } 
+      else {
         display.showNumberDec(beatAvg, false); // 디스플레이에 평균 심박수 표시
         lcd.clear(); // LCD 화면 지우기
         lcd.setCursor(0, 0); // LCD 커서 위치 설정
         lcd.println(beatAvglast); // 이전 심박수 평균값 출력
-        BTserial.print("현재 심박수 : ");
-        BTserial.print(beatAvg);
-        BTserial.print("이전 심박수 : ");
-        BTserial.print(beatAvglast);
-        BTserial.print("(단위 : bpm");
+        BTSerial.print("현재 심박수 : ");
+        BTSerial.print(beatAvg);
+        BTSerial.print("이전 심박수 : ");
+        BTSerial.print(beatAvglast);
+        BTSerial.print("(단위 : bpm");
         delay(1000);
         beatAvglast = beatAvg; // 현재 심박수 평균값을 이전 값으로 저장
 
         if (beatAvg < 60 || beatAvg > 100) {
           // 비정상적인 심박수 범위에 대한 처리 코드를 여기에 추가해야 함
+          setColor(255,255,255);
         }
       }
     }
