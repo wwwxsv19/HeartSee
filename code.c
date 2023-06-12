@@ -5,8 +5,11 @@
 #include <LiquidCrystal_I2C.h> // I2C LCD 라이브러리
 #include<TM1637Display.h>
 
+<<<<<<< HEAD
 #define C 262
 
+=======
+>>>>>>> f603c17679d943ac66e7d7ab8dc7afce82371ffa
 #define CLK 6
 #define DIO 7
 TM1637Display display(CLK, DIO);
@@ -61,7 +64,10 @@ void setup()
   pinMode(redPin, OUTPUT); // 빨간색 LED 출력 설정
   pinMode(greenPin, OUTPUT); // 초록색 LED 출력 설정
   pinMode(bluePin, OUTPUT); // 파란색 LED 출력 설정
+<<<<<<< HEAD
   pinMode(buzzerPin, OUTPUT); //부저 출력 설정
+=======
+>>>>>>> f603c17679d943ac66e7d7ab8dc7afce82371ffa
 }
 
 void loop()
@@ -96,12 +102,17 @@ void loop()
       rateSpot %= RATE_SIZE; // 배열 인덱스를 순환시킴
 
       // 저장된 심박수의 평균값 계산
+<<<<<<< HEAD
       beatAvg = 0;   
+=======
+      beatAvg = 0;
+>>>>>>> f603c17679d943ac66e7d7ab8dc7afce82371ffa
       for (byte x = 0 ; x < RATE_SIZE ; x++)
         beatAvg += rates[x];
       beatAvg /= RATE_SIZE;
 
       if (irValue < 50000){
+<<<<<<< HEAD
         display.showNumberDec(2, false); // IR 값이 임계값보다 작으면 디스플레이에 0 표시
       } 
       else {
@@ -125,6 +136,26 @@ void loop()
         }
         else{
           setColor(0,255,0);
+=======
+        display.showNumberDec(0, false); // IR 값이 임계값보다 작으면 디스플레이에 0 표시
+      } 
+      else {
+        display.showNumberDec(beatAvg, false); // 디스플레이에 평균 심박수 표시
+        lcd.clear(); // LCD 화면 지우기
+        lcd.setCursor(0, 0); // LCD 커서 위치 설정
+        lcd.println(beatAvglast); // 이전 심박수 평균값 출력
+        BTSerial.print("현재 심박수 : ");
+        BTSerial.print(beatAvg);
+        BTSerial.print("이전 심박수 : ");
+        BTSerial.print(beatAvglast);
+        BTSerial.print("(단위 : bpm");
+        delay(1000);
+        beatAvglast = beatAvg; // 현재 심박수 평균값을 이전 값으로 저장
+
+        if (beatAvg < 60 || beatAvg > 100) {
+          // 비정상적인 심박수 범위에 대한 처리 코드를 여기에 추가해야 함
+          setColor(255,255,255);
+>>>>>>> f603c17679d943ac66e7d7ab8dc7afce82371ffa
         }
       }
     }
