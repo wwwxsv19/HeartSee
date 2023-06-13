@@ -13,7 +13,7 @@ TM1637Display display(CLK, DIO);
 
 #define BT_RXD 4
 #define BT_TXD 5
-SoftwareSerial bt(BT_RXD,BT_TXD);
+SoftwareSerial bt(BT_RXD,BT_TXD); // bt 소프트웨어 시리얼 시작
 
 LiquidCrystal_I2C lcd(0x27, 16, 2); // I2C LCD 객체 생성
 
@@ -32,6 +32,8 @@ int buzzerPin = 2; // 부저 핀
 int redPin = 11; // 빨간색 LED 핀
 int greenPin = 12; // 초록색 LED 핀
 int bluePin = 13; // 파란색 LED 핀
+
+int sendHB; // 앱인벤터로 심박수 보낼 때 쓸 변수
 
 void setup()
 {
@@ -64,6 +66,9 @@ void setup()
 
 void loop()
 {
+  //시작을 알리기 위한 시작값
+  bt.write(20);
+  
   if(bt.available()){
     Serial.write(bt.read());
   }
@@ -114,12 +119,14 @@ void loop()
         lcd.print(beatAvglast+45);
         lcd.print("(단위 : bpm");
         delay(1000);
+
+        sendHB = beatAvg+45; // 변수에 심박수 값 넣음
         beatAvglast = beatAvg; // 현재 심박수 평균값을 이전 값으로 저장
 
-        if (beatAvg+45 < 60 || beatAvg+45 > 100) {
-          // 비정상적인 심박수 범위에 대한 처리 코드를 여기에 추가해야 함
+        if (beatAvg+45 < 60 || beatAvg+45 > 100) {// 비정상적인 심박수 범위에 대한 처리 코드
           setColor(255,0,0);
           tone(buzzerPin, C);
+          bt.write(sendHB);
         }
         setColor(0,255,0);
         
