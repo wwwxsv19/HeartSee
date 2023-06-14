@@ -66,8 +66,14 @@ void setup()
 
 void loop()
 {
+<<<<<<< HEAD
   Serial.println(sendHB);
 
+=======
+  //시작을 알리기 위한 시작값
+  bt.write(20);
+  
+>>>>>>> 5325a70889bfb6616fe54ad63b0b65dd3f3e07f3
   if(bt.available()){
     Serial.write(bt.read());
   }
@@ -118,6 +124,7 @@ void loop()
         lcd.print(beatAvglast+45);
         lcd.print("(단위 : bpm");
         delay(1000);
+<<<<<<< HEAD
 
         sendHB = beatAvg+45; // 변수에 심박수 값 넣음
         beatAvglast = beatAvg; // 현재 심박수 평균값을 이전 값으로 저장
@@ -129,6 +136,16 @@ void loop()
         }
         else{
           setColor(0,255,0);
+=======
+
+        sendHB = beatAvg+45; // 변수에 심박수 값 넣음
+        beatAvglast = beatAvg; // 현재 심박수 평균값을 이전 값으로 저장
+
+        if (beatAvg+45 < 60 || beatAvg+45 > 100) {// 비정상적인 심박수 범위에 대한 처리 코드
+          setColor(255,0,0);
+          tone(buzzerPin, C);
+          bt.write(sendHB);
+>>>>>>> 5325a70889bfb6616fe54ad63b0b65dd3f3e07f3
         }
       }
     }
